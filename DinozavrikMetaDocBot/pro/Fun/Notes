@@ -1,0 +1,31 @@
+Нужные типы файлов:
+    # текстовые файлы:'.txt', '.doc', '.pdf', '.md',
+    # графические файлы: '.jpeg', '.jpg', '.png', '.gif',
+    # аудио файлы: '.mp3', '.wav', '.ogg',
+    # видео файлы: '.avi', '.mp4', '.mkv',
+    # программные файлы: '.py', '.cpp', '.cs'
+    # исполняемые файлы '.exe', '.jar', '.dll'
+
+
+Структура проекта:
+        Pro/
+        └── Fun/
+            ├── __init__.py
+            ├── bot_instance.py
+            ├── commands.py
+            ├── file_handler.py
+            ├── Notes
+            └── Theory
+        └── main.py
+
+
+Pro/
+└── Fun/
+    ├── __init__.py
+    ├── bot_in.py
+    └── commands.py
+└── main.py
+
+
+
+

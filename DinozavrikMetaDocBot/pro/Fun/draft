@@ -1,0 +1,258 @@
+from telebot.async_telebot import AsyncTeleBot
+import os
+
+# Создаем экземпляр бота
+bot = AsyncTeleBot('token')
+SAVE_FOLDER = 'Pro/Fun/CompareFILES/saveF/'
+
+# Убедитесь, что папка существует
+if not os.path.exists(SAVE_FOLDER):
+    os.makedirs(SAVE_FOLDER)
+
+# Список для хранения файлов
+user_files = []
+
+# Обработчик для команд /start, /Hello, /Hola
+@bot.message_handler(commands=['start', 'Hello', 'Hola'])
+async def start_command(message):
+    await bot.send_message(message.chat.id,
+                           f"Hola, {message.from_user.first_name}!\nI am dinozavrik Metadoc\nLet's be friends.🌸\nI am learning to work with files.")
+
+@bot.message_handler(commands=['help'])  # Обрабатываем команду /help
+async def help_command(message):
+    commands_list = [
+        '/start - Начало общения с ботом',
+        '/help - Получить список доступных команд',
+        '/save_file_for_work - Сохранить файл для обработки'
+    ]
+    commands_text = "<u>Available Commands:</u>\n" + "\n".join(commands_list)
+    await bot.send_message(message.chat.id, commands_text, parse_mode='html')
+
+@bot.message_handler(content_types=['document'])  # Обработка документов
+async def handle_file(message):
+    user_files.append(message.document.file_id)  # Сохраняем file_id
+
+    await bot.send_message(message.chat.id, "Файл принят! Вы можете отправить команду /save_file_for_work для сохранения.")
+
+@bot.message_handler(commands=['save_file_for_work'])  # Обработчик для команды /save_file_for_work
+async def save_files_command(message):
+    for file_id in user_files:
+        file_info = await bot.get_file(file_id)
+        file_path = file_info.file_path
+
+        # Загружаем файл
+        downloaded_file = await bot.download_file(file_path)
+
+        # Путь для сохранения файла
+        file_name = file_info.file_path.split('/')[-1]  # Получаем имя файла из пути
+        file_save_path = os.path.join(SAVE_FOLDER, file_name)
+
+        # Сохраняем файл
+        with open(file_save_path, 'wb') as new_file:
+            new_file.write(downloaded_file)
+
+    user_files.clear()  # Очищаем список после сохранения
+    await bot.send_message(message.chat.id, "Файлы успешно сохранены! 🎉")
+
+# Запускаем бота
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(bot.polling())
+
+
+
+
+
+
+
+
+
+"""
+import os
+import telebot
+from Beginnig import bot  # импортируем объект bota
+
+
+# Проверяем, является ли файл допустимым
+def is_valid_file_extension(file_name):
+    valid_extensions = (
+        '.txt', '.doc', '.pdf',  # текстовые файлы
+        '.jpeg', '.jpg', '.png', '.gif',  # графические файлы
+        '.mp3', '.wav', '.ogg',  # аудио файлы
+        '.avi', '.mp4', '.mkv',  # видео файлы
+        '.exe', '.jar', '.dll'  # исполняемые файлы
+    )
+    return file_name.lower().endswith(valid_extensions)
+
+
+# Обработка документов, отправленных пользователем
+@bot.message_handler(content_types=['document'])
+def handle_document(message):
+    # Получаем файл, отправленный пользователем
+    doc_info = message.document
+    file_name = doc_info.file_name
+
+    # Проверяем, валидное ли расширение файла
+    if not is_valid_file_extension(file_name):
+        bot.send_message(message.chat.id,
+                         "Недопустимый файл. Пожалуйста, загрузите текстовый, графический, аудио, видео или исполняемый файл.")
+        return
+
+    # Скачиваем файл
+    file_path = bot.get_file(doc_info.file_id)
+    downloaded_file = bot.download_file(file_path.file_path)
+
+    # Переименовываем файл (можно изменить логику переименования на свою)
+    new_file_name = f"renamed_{file_name}"  # Пример переименования
+    with open(new_file_name, 'wb') as new_file:
+        new_file.write(downloaded_file)
+
+    # Отправляем обратно переименованный файл
+    with open(new_file_name, 'rb') as new_file:
+        bot.send_document(message.chat.id, new_file)
+
+    # Удаляем временный файл из сервера
+    os.remove(new_file_name)
+
+
+# Создаем словарь с допустимыми расширениями
+ALLOWED_EXTENSIONS = {
+    'text': ['txt', 'doc', 'pdf'],
+    'image': ['jpeg', 'png', 'gif'],
+    'audio': ['mp3', 'wav', 'ogg'],
+    'video': ['avi', 'mp4', 'mkv'],
+    'executable': ['exe', 'jar', 'dll'],
+}
+
+
+# Функция для получения расширения файла
+def get_file_extension(filename):
+    return filename.rsplit('.', 1)[-1].lower() if '.' in filename else None
+
+
+@bot.message_handler(content_types=['document'])  # Обработка документов
+def handle_document(message):
+    # Получаем файл
+    file_info = bot.get_file(message.document.file_id)
+
+    # Имя сохраняемого файла
+    original_filename = message.document.file_name
+    extension = get_file_extension(original_filename)
+
+    if extension in [ext for exts in ALLOWED_EXTENSIONS.values() for ext in exts]:
+        # Переименовываем файл (например, добавляем префикс "renamed_")
+        new_filename = f"renamed_{original_filename}"
+
+        # Сохраняем файл
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        with open(new_filename, 'wb') as new_file:
+            new_file.write(downloaded_file)
+
+        # Подтверждаем успешное переименование
+        bot.send_message(message.chat.id, f"Файл '{original_filename}' успешно переименован в '{new_filename}'!")
+    else:
+        # Если файл не поддерживается
+        bot.send_message(message.chat.id, "Извините, это расширение файла не поддерживается.")
+
+
+##############################################################################################################
+# Функция для БЕЗОПАСНОГО переименования и сохранения файлов
+def handle_document(bot, message):
+    # Получаем файл
+    file_info = bot.get_file(message.document.file_id)
+
+    # Задаем путь для сохранения, безопасный относительно текущей папки
+    save_dir = 'downloads'  # Директория, куда будем сохранять файлы
+    os.makedirs(save_dir, exist_ok=True)  # Создаем директорию, если она не существует
+
+    # Получаем оригинальное имя файла
+    original_file_name = message.document.file_name
+
+    # Определяем новое имя файла (добавляя ID пользователя)
+    new_file_name = f"{message.from_user.id}_{original_file_name}"
+
+    # Ограничиваем длину имени файла до 255 символов
+    new_file_name = new_file_name[:255]
+
+    # Получаем полный путь
+    save_path = os.path.join(save_dir, new_file_name)
+
+    # Проверяем безопасные расширения файлов
+    safe_extensions = ('.txt', '.doc', '.pdf', '.jpeg', '.png', '.gif',
+                       '.mp3', '.wav', '.ogg', '.avi', '.mp4', '.mkv',
+                       '.exe', '.jar', '.dll')
+    if not any(new_file_name.endswith(ext) for ext in safe_extensions):
+        bot.send_message(message.chat.id, "Не поддерживаемый тип файла. Пожалуйста, загружайте файлы с поддерживаемыми расширениями.")
+        return
+##############################################################################################################
+
+    # Скачиваем файл
+    downloaded_file = bot.download_file(file_info.file_path)
+
+    # Сохраняем файл под новым именем
+    with open(save_path, 'wb') as new_file:
+        new_file.write(downloaded_file)
+
+    # Сообщаем пользователю, что файл был успешно загружен
+    bot.send_message(message.chat.id, f'Файл "{original_file_name}" успешно загружен и переименован в "{new_file_name}" в папке "{save_dir}".')
+"""
+
+
+
+
+
+
+
+
+
+"""
+
+
+######################################
+
+# Проверяем, является ли файл допустимым
+async def is_valid_file_extension(file_name):
+    valid_extensions = (
+        '.txt', '.doc', '.pdf',  # текстовые файлы
+        '.jpeg', '.jpg', '.png', '.gif',  # графические файлы
+        '.mp3', '.wav', '.ogg',  # аудио файлы
+        '.avi', '.mp4', '.mkv',  # видео файлы
+        '.exe', '.jar', '.dll'  # исполняемые файлы
+    )
+    return file_name.lower().endswith(valid_extensions)
+
+
+
+# Обработка документов, отправленных пользователем
+@bot.message_handler(content_types=['/handle_document'])
+def handle_document(message):
+    # Получаем файл, отправленный пользователем
+    bot.send_message(message.chat.id,
+                     "Отправьте файл.")
+    doc_info = message.document
+    file_name = doc_info.file_name
+
+    # Проверяем, валидное ли расширение файла
+    if not is_valid_file_extension(file_name):
+        bot.send_message(message.chat.id,
+                         "Недопустимый файл. Пожалуйста, загрузите текстовый, графический, аудио, видео или исполняемый файл.")
+        return
+
+    # Скачиваем файл
+    file_path = bot.get_file(doc_info.file_id)
+    downloaded_file = bot.download_file(file_path.file_path)
+
+    # Переименовываем файл (можно изменить логику переименования на свою)
+    new_file_name = f"renamed_{file_name}"  # Пример переименования
+    with open(new_file_name, 'wb') as new_file:
+        new_file.write(downloaded_file)
+
+    # Отправляем обратно переименованный файл
+    with open(new_file_name, 'rb') as new_file:
+        bot.send_document(message.chat.id, new_file)
+
+    # Удаляем временный файл из сервера
+    os.remove(new_file_name)
+
+"""
