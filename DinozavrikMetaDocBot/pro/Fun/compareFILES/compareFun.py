@@ -17,7 +17,6 @@ def read_file(file_path):
         #raise ValueError("Неподдерживаемый формат файла")
         return 'Неподдерживаемый формат файла'
 
-
 def compare_files(file1, file2):
     try:
         # Проверка формата файлов
@@ -44,6 +43,3 @@ def compare_files(file1, file2):
                 return 'Файлы разные ️⬅️📁➡️'
     except Exception as e:
         return f'[!] Ошибка: {e}'
-
-#compare_images('C:/Users/Sofia/Pictures/Saved Pictures/D.jpg', 'C:/Users/Sofia/Pictures/Saved Pictures/D2.jpg')
-#compare_files('C:/Users/Sofia/Desktop/(2).txt', 'C:/Users/Sofia/Desktop/5st.txt')

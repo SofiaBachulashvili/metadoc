@@ -10,5 +10,3 @@ TOKEN = os.getenv('TOKEN')
 
 # Создаем экземпляр бота с использованием токена
 bot = AsyncTeleBot(TOKEN)  # токен
-
-

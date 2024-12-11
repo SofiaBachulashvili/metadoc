@@ -1,3 +1,4 @@
+"""
 from .botik import bot  # Импортируем объект бота
 from telebot import types
 from .compareFILES.compareFun import compare_files
@@ -59,3 +60,4 @@ async def callback_query(call):
             await bot.send_message(call.message.chat.id, text)
     else:
         await bot.send_message(call.message.chat.id, 'Недостаточно файлов в папке.')
+"""

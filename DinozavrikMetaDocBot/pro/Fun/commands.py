@@ -5,15 +5,11 @@ import shutil
 from .botik import bot  # Импортируем объект бота, используя относительный путь .botik
 from .compareFILES.compareFun import compare_files
 
-
-
-
-
 # Обработчик для команд /start, /Hello, /Hola
 @bot.message_handler(commands=['start', 'Hello', 'Hola'])
 async def start_command(message):
     await bot.send_message(message.chat.id,
-                           f"Hola, {message.from_user.first_name}!\nI am dinozavrik Metadoc\nLet's be friends.🌸\nI am learning to work with files.")
+                           f"Hola, {message.from_user.first_name}!\nI am dinozavrik Metadoc🦕\nLet's be friends.🌸\nI am learning to work with files.")
 
 
 @bot.message_handler(commands=['help'])  # Обрабатываем команду /help
@@ -24,7 +20,8 @@ async def help_command(message):
         '/help - Получить список доступных команд',
         '/handle_document - Переименовать документ',
         '/save_file_for_work - Сохранить файл для обработки',
-        '/click - Выбор действия с файлом'
+        '/click - Выбор действия с файлом',
+        #'/Dinozavrik_Secret_Diary - Узнать историю Dinozavrika'
     ]
 
     # Формируем сообщение со списком команд
@@ -40,43 +37,29 @@ async def help_command(message):
     """
 
 
-
-"""
-@bot.message_handler(content_types=['photo'])
-async def get_picture(message):
-    await bot.reply_to(message, "I know him! So handsome!")
-"""
 #######################################################################################################
 # Функция временного хранения файла: сохранение -> (обработка) -> удаление
 
 
-def delete_files_in_directory(directory_path):
+def delete_directory(directory_path):
+    # Функция для удаления директории и всех её содержимых файлов и папок.
+    # :param directory_path: Путь к папке, которую нужно удалить
+    # :return: Результат удаления
+
     # Проверяем, существует ли папка
     if not os.path.exists(directory_path):
         return f"Папка '{directory_path}' не существует."
 
-    """
     # Подтверждение пользователя
-    confirmation = input(f"Вы уверены, что хотите удалить все файлы из '{directory_path}'? (да/нет): ")
+    confirmation = input(f"Вы уверены, что хотите удалить '{directory_path}' вместе со всем содержимым? (да/нет): ")
     if confirmation.lower() != 'да':
         return "Удаление отменено."
-    """
 
-    results = []  # Список для накопления результатов
-    # Проходим по всем файлам и папкам в директории
-    for filename in os.listdir(directory_path):
-        file_path = os.path.join(directory_path, filename)
-        try:
-            if os.path.isfile(file_path):
-                os.remove(file_path)  # Удаляем файл
-                results.append(f"Файл '{file_path}' удалён.")
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)  # Удаляем директорию и её содержимое
-                results.append(f"Папка '{file_path}' и все её содержимое удалены.")
-        except Exception as e:
-            results.append(f"Ошибка при удалении '{file_path}': {e}")
-
-    return "\n".join(results)  # Возвращаем все результаты как строку
+    try:
+        shutil.rmtree(directory_path)  # Удаляем директорию и её содержимое
+        return f"Папка '{directory_path}' и все её содержимое были удалены."
+    except Exception as e:
+        return f"[!] Ошибка при удалении '{directory_path}': {e}"
 
 
 # Создание кнопок
@@ -97,16 +80,17 @@ async def buttons(message):
 # Функции для кнопок
 @bot.callback_query_handler(func=lambda call: True)
 async def callback_query(call):
-
+    user_id = call.from_user.id # Получаем ID пользователя
+    user_folder = os.path.join('Pro/Fun/saveFiles', str(user_id))  # Папка пользователя
     # Получаем список всех файлов в папке
-    files = [f for f in os.listdir(SAVE_FOLDER) if os.path.isfile(os.path.join(SAVE_FOLDER, f))]
+    files = [f for f in os.listdir(user_folder) if os.path.isfile(os.path.join(user_folder, f))]
     # Сортируем файлы по времени модификации и берем последние два
-    files.sort(key=lambda x: os.path.getmtime(os.path.join(SAVE_FOLDER, x)), reverse=True)
+    files.sort(key=lambda x: os.path.getmtime(os.path.join(user_folder, x)), reverse=True)
 
     # Получаем адреса последних двух файлов
     if len(files) >= 2:
-        file1 = os.path.join(SAVE_FOLDER, files[0])
-        file2 = os.path.join(SAVE_FOLDER, files[1])
+        file1 = os.path.join(user_folder, files[0])
+        file2 = os.path.join(user_folder, files[1])
 
         if call.data == 'convert':
             text = 'Преобразованный файл: '
@@ -119,8 +103,8 @@ async def callback_query(call):
             await bot.answer_callback_query(call.id)
             await bot.send_message(call.message.chat.id, text)
             answer = compare_files(file1, file2)
-            delete_files_in_directory(SAVE_FOLDER) # Очистка папки SAVE_FOLDER
-            answer = answer +'\nПапка SAVE_FOLDER очищена! 🗑️'
+            delete_directory(user_folder) # Удаление папки user_folder
+            answer = answer +'\n\nПапка user_folder удалена! 🗑️'
             await bot.send_message(call.message.chat.id, answer)
 
         elif call.data == 'rename':
@@ -131,27 +115,30 @@ async def callback_query(call):
         await bot.send_message(call.message.chat.id, 'Недостаточно файлов в папке.')
 
 
-
-
-SAVE_FOLDER = 'Pro/Fun/saveFiles'
-
-# Убедитесь, что папка существует
-if not os.path.exists(SAVE_FOLDER):
-    #os.makedirs(SAVE_FOLDER)
-    os.mkdir(SAVE_FOLDER)
-
 # Список для хранения файлов
 user_files = []
 
 @bot.message_handler(content_types=['document'])  # Обработка документов
 async def handle_file(message):
     user_files.append(message.document.file_id)  # Сохраняем file_id в список
-    # Отладочное сообщение для проверки file_id
+    user_id = message.from_user.id  # Получаем ID пользователя
+
+    # Убедитесь, что папка для данного пользователя существует
+    user_folder = os.path.join('Pro/Fun/saveFiles', str(user_id))
+    if not os.path.exists(user_folder):
+        os.makedirs(user_folder)
+
+    # Отладочное сообщение для проверки file_id и user_id
     await bot.send_message(message.chat.id,
-                           f"Файл принят! Ваш file_id: {message.document.file_id}. Вы можете отправить команду /save_file_for_work для сохранения.")
+                           f"Файл принят!\nВаш file_id: {message.document.file_id}.\n"
+                           f"ID вашего аккаунта: {user_id}.\n"
+                           "Вы можете отправить команду /save_file_for_work для сохранения.")
 
 @bot.message_handler(commands=['save_file_for_work'])  # Обработчик для команды /save_file_for_work
 async def save_files_command(message):
+    user_id = message.from_user.id  # Получаем ID пользователя
+    user_folder = os.path.join('Pro/Fun/saveFiles', str(user_id))  # Папка пользователя
+
     if not user_files:
         await bot.send_message(message.chat.id, "Нет файлов для сохранения! 📂")
         return
@@ -167,7 +154,7 @@ async def save_files_command(message):
         try:
             downloaded_file = await bot.download_file(file_path)
             file_name = file_info.file_path.split('/')[-1]  # Получаем имя файла из пути
-            file_save_path = os.path.join(SAVE_FOLDER, file_name)
+            file_save_path = os.path.join(user_folder, file_name)
 
             # Сохраняем файл
             with open(file_save_path, 'wb') as new_file:
@@ -175,13 +162,13 @@ async def save_files_command(message):
             await bot.send_message(message.chat.id,
                                    f"Файл {file_name} успешно сохранен в {file_save_path}.")  # Отладочное сообщение
         except Exception as e:
-            await bot.send_message(message.chat.id, f" [!] Ошибка при сохранении файла {file_name}: {e}")
+            await bot.send_message(message.chat.id, f"Ошибка при сохранении файла {file_name}: {e}")
             return
 
         user_files.clear()  # Очищаем список после сохранения
 
         # Проверяем наличие файлов в папке
-        if os.listdir(SAVE_FOLDER):  # Если папка не пустая
+        if os.listdir(user_folder):  # Если папка не пустая
             await bot.send_message(message.chat.id, "Файлы успешно сохранены! 🎉")
         else:
             await bot.send_message(message.chat.id,
@@ -206,5 +193,5 @@ async def hola(message):
         await bot.reply_to(message, f'ID: {message.from_user.id}')
     else:
         await bot.send_message(message.chat.id, "😭")
-        await bot.reply_to(message, "Мне это не понятно \n Давай ты ещё разок напишешь")
+        await bot.reply_to(message, "Мне это не понятно \nДавай ты ещё разок напишешь")
         await bot.send_message(message.chat.id, "🥹")

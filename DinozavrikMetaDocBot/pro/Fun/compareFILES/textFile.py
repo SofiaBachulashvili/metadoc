@@ -33,4 +33,3 @@ def compare_text_files(file1, file2):
     lines2 = read_text_file(file2)
     differ = difflib.unified_diff(lines1, lines2, fromfile=file1, tofile=file2)
     print('\n'.join(differ))
-
