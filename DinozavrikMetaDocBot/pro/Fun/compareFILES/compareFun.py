@@ -15,38 +15,35 @@ def read_file(file_path):
         return None  # Обработка изображений отдельно
     else:
         #raise ValueError("Неподдерживаемый формат файла")
-        Er = 'Неподдерживаемый формат файла'
-        return Er
+        return 'Неподдерживаемый формат файла'
 
 
 def compare_files(file1, file2):
-    str = 'No compare yet'
     try:
+        # Проверка формата файлов
+        format1 = file1.split('.')[-1]
+        format2 = file2.split('.')[-1]
+
+        if format1 != format2:
+            return f'Файлы разного формата: {format1} и {format2}. Невозможно провести сравнение.'
+
         if file1.endswith(('.jpeg', '.jpg', '.png', '.gif')) and file2.endswith(('.jpeg', '.jpg', '.png', '.gif')):
             are_equal = compare_images(file1, file2)
             if are_equal:
-                str = 'Изображения одинаковые'
-                return str
+                return 'Изображения одинаковые 🖼️🖼️'
             else:
-                str = 'Изображения разные'
-                return str
+                return 'Изображения разные ️⬅️🖼️➡️'
         else:
             lines1 = read_file(file1)
             lines2 = read_file(file2)
             differ = list(difflib.unified_diff(lines1, lines2, fromfile=file1, tofile=file2))
 
             if not differ:
-                str = 'Файлы одинаковые'
-                return str
+                return 'Файлы одинаковые 📁📁'
             else:
-                str = 'Файлы разные'
-                return str
+                return 'Файлы разные ️⬅️📁➡️'
     except Exception as e:
-        e = '[!] Ошибка '
-        return e
-        #print(f"Ошибка: {e}")
-
-# Пример использования
+        return f'[!] Ошибка: {e}'
 
 #compare_images('C:/Users/Sofia/Pictures/Saved Pictures/D.jpg', 'C:/Users/Sofia/Pictures/Saved Pictures/D2.jpg')
 #compare_files('C:/Users/Sofia/Desktop/(2).txt', 'C:/Users/Sofia/Desktop/5st.txt')
