@@ -24,8 +24,7 @@ async def help_command(message):
         '/help - Получить список доступных команд',
         '/handle_document - Переименовать документ',
         '/save_file_for_work - Сохранить файл для обработки',
-        '/click - Выбор действия с файлом',
-        '/Dinozavrik_Secret_Diary - Узнать историю Dinozavrika'
+        '/click - Выбор действия с файлом'
     ]
 
     # Формируем сообщение со списком команд
@@ -41,15 +40,6 @@ async def help_command(message):
     """
 
 
-@bot.message_handler(commands=['Dinozavrik_Secret_Diary'])
-async def info_command(message):
-    # Отправляем пользователю информацию о боте
-    await bot.send_message(message.chat.id, "Ooow, it's so cute that you want to know about me."
-                                            "\nI was born 13.11.2024.\nOn first day of my life could answer only for /start."
-                                            "\n(14.11.2024) I can answer for привет."
-                                            "\n\nShe needed some rest and time to do somethings for university."
-                                            "\nI miss you, mum...\n"
-                                            "\nToday (05.12.2024)I have button to supply you action with file.")
 
 """
 @bot.message_handler(content_types=['photo'])
