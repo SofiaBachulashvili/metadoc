@@ -1,4 +1,6 @@
 """
+Check: разные ✅, одинаковые✅
+
 Форматы: .doc, .docx
 Библиотека: python-docx
 Установка: pip install python-docx

@@ -27,11 +27,12 @@ def compare_files(file1, file2):
             return f'Файлы разного формата: {format1} и {format2}. Невозможно провести сравнение.'
 
         if file1.endswith(('.jpeg', '.jpg', '.png', '.gif')) and file2.endswith(('.jpeg', '.jpg', '.png', '.gif')):
-            are_equal = compare_images(file1, file2)
-            if are_equal:
-                return 'Изображения одинаковые 🖼️🖼️'
-            else:
-                return 'Изображения разные ️⬅️🖼️➡️'
+            return compare_images(file1, file2)
+            # are_equal = compare_images(file1, file2)
+            # if are_equal:
+            #     return 'Изображения одинаковые 🖼️🖼️'
+            # else:
+            #     return 'Изображения разные ️⬅️🖼️➡️'
         else:
             lines1 = read_file(file1)
             lines2 = read_file(file2)

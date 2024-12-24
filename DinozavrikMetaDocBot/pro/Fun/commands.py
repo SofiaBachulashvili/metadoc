@@ -36,7 +36,6 @@ async def help_command(message):
         <u> </u> - подчеркивание
     """
 
-
 #######################################################################################################
 # Функция временного хранения файла: сохранение -> (обработка) -> удаление
 
@@ -50,10 +49,10 @@ def delete_directory(directory_path):
     if not os.path.exists(directory_path):
         return f"Папка '{directory_path}' не существует."
 
-    # Подтверждение пользователя
-    confirmation = input(f"Вы уверены, что хотите удалить '{directory_path}' вместе со всем содержимым? (да/нет): ")
-    if confirmation.lower() != 'да':
-        return "Удаление отменено."
+    # # Подтверждение пользователя
+    # confirmation = input(f"Вы уверены, что хотитееееееееееееееее удалить '{directory_path}' вместе со всем содержимым? (да/нет): ")
+    # if confirmation.lower() != 'да':
+    #     return "Удаление отменено."
 
     try:
         shutil.rmtree(directory_path)  # Удаляем директорию и её содержимое
@@ -103,12 +102,12 @@ async def callback_query(call):
             await bot.answer_callback_query(call.id)
             await bot.send_message(call.message.chat.id, text)
             answer = compare_files(file1, file2)
-            delete_directory(user_folder) # Удаление папки user_folder
+            #delete_directory(user_folder) # Удаление папки user_folder
             answer = answer +'\n\nПапка user_folder удалена! 🗑️'
             await bot.send_message(call.message.chat.id, answer)
 
         elif call.data == 'rename':
-            text = 'Так гораздо лучше!\nПереименованный файл: '
+            text = 'Так гораздо лучше!\nПереименованный файл: ✅✅✅✅✅'
             await bot.answer_callback_query(call.id)
             await bot.send_message(call.message.chat.id, text)
     else:

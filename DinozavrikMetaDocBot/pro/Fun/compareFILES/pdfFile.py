@@ -1,4 +1,7 @@
 """
+Check:
+разные ✅ одинаковые ✅
+
 Форматы: .pdf
 Библиотеки: PyPDF2, pdfplumber
 Установка: pip install PyPDF2

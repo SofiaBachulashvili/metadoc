@@ -1,7 +1,11 @@
 """
+Check:
+разные ✅ одинаковые ✅
+
 Форматы: .jpeg, .jpg, .png, .gif
 Библиотека: Pillow
 Установка: pip install Pillow
+
 Библиотека: numpy
 Установка:pip install numpy
 """
@@ -15,11 +19,13 @@ def compare_images(img1_path, img2_path):
     arr2 = np.array(img2)
 
     if arr1.shape != arr2.shape:
-        print("Изображения имеют разные размеры.")
-        return
+        #print("Изображения имеют разные размеры.")
+        return "Изображения имеют разные размеры."
 
     are_equal = np.array_equal(arr1, arr2)
     if are_equal:
-        print("Изображения идентичны!")
+        # print("Изображения идентичны!")
+        return "Изображения идентичны!"
     else:
-        print("Изображения отличаются.")
+        # print("Изображения отличаются.")
+        return "Изображения отличаются."
